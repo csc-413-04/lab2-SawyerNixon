@@ -1,6 +1,30 @@
 package com.company;
 
-class MatrixThreads {
+class MatrixThreads extends Thread{
+  int[][] a, b, d;
+
+  MatrixThreads(int[][] a, int[][] b, int [][] d) {
+    this.a = a;
+    this.b = b;
+    this.d = d;
+  }
+
+  public static int[][] multiplyParallel(int[][] a, int[][] b) {
+    int size = a.length;
+    int answer[][] = new int[size][size];
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        for (int k = 0; k < size; k++) {
+          answer[i][j] = answer[i][j] + (a[i][k] * b[k][j]);
+        }
+      }
+    }
+    return answer;
+  }
+@Override
+    public void run() {
+      d = multiplyParallel(a,b);
+    }
 
 }
 
@@ -66,7 +90,15 @@ public class Main {
         startTime = System.nanoTime();
         // filler, make either a new class that extends thread, or have this one extend thread
         // figure out how to split work up into at least 2 more threads
-        int d[][] = multiplyParallel(a, b);
+        int d[][] = new int[size][size];
+        MatrixThreads M = new MatrixThreads(a,b,d);
+
+        M.start();
+        try {
+          M.join();
+        } catch(InterruptedException e){
+          System.out.println(e);
+      }
         endTime = System.nanoTime();
         long parallelTime = endTime - startTime;
         System.out.println("Parallel Time " + parallelTime + " ns");
